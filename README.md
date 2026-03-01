@@ -1,4 +1,4 @@
-#📌 About This Project
+<h1>📌 About This Project</h1>
 
 This project demonstrates how JavaScript Events work and how they make websites interactive.
 
