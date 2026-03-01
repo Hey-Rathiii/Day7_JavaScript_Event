@@ -22,3 +22,19 @@ The goal was to understand how JavaScript listens and responds to user actions.
  ├── Controller.cs
  ├── HomeController.cs
  └── Index.cshtml
+
+<h1>📚 What I Learned</h1>
+
+How addEventListener() works
+
+Understanding the Event Object
+
+Event Bubbling & Propagation
+
+Improving user experience with JS
+
+<h1>🙌 Connect With Me</h1>
+
+<h2>GitHub: https://github.com/Hey-Rathiii</h2>
+
+<h1>⭐ If you like this project, give it a star!</h1>
