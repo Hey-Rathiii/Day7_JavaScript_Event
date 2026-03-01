@@ -1,4 +1,4 @@
-📌 About This Project
+#📌 About This Project
 
 This project demonstrates how JavaScript Events work and how they make websites interactive.
 
