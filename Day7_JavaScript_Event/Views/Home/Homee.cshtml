@@ -1,0 +1,272 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<style>
+    body {
+        font-family: Arial;
+        padding: 20px;
+    }
+
+    input, select, button {
+        padding: 10px;
+        margin: 6px 0;
+        width: 260px;
+    }
+
+    button {
+        width: 130px;
+        cursor: pointer;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .actions button {
+        width: auto;
+        padding: 6px 10px;
+        margin-right: 6px;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+
+    .ok {
+        color: green;
+        font-weight: bold;
+    }
+</style>
+
+
+<h2>Student Registration Form (Pure JavaScript)</h2>
+
+<div class="row">
+    <div>
+        <input id="name" type="text" placeholder="Student Name" />
+        <input id="email" type="text" placeholder="Email" />
+        <input id="marks" type="number" placeholder="Marks" />
+        <select id="course">
+            <option value="">-- Select Course --</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="ASP.NET Core">ASP.NET Core</option>
+            <option value="SQL">SQL</option>
+        </select>
+
+        <div>
+            <button id="saveBtn">Add Student</button>
+            <button id="cancelBtn" style="display:none;">Cancel</button>
+        </div>
+
+        <p id="msg"></p>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Marks</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+        <!-- rows will be created by JS -->
+    </tbody>
+</table>
+
+<script>
+        // ------------------------
+    // 1) STATE (Data Store)
+    // ------------------------
+    // We'll store students as an array of objects (like API data)
+    let students = [];
+    let editIndex = -1; // -1 means: we are in "Add" mode, not editing
+
+    // ------------------------
+    // 2) SELECTORS
+    // ------------------------
+    const nameInput = document.querySelector("#name");
+    const emailInput = document.querySelector("#email");
+    const marksInput = document.querySelector("#marks");
+    const courseSelect = document.querySelector("#course");
+
+    const saveBtn = document.querySelector("#saveBtn");
+    const cancelBtn = document.querySelector("#cancelBtn");
+
+    const tbody = document.querySelector("#tbody");
+    const msg = document.querySelector("#msg");
+
+    // ------------------------
+    // 3) HELPERS
+    // ------------------------
+    function showMessage(text, type) {
+      msg.className = type === "ok" ? "ok" : "error";
+      msg.textContent = text;
+    }
+
+    function clearForm() {
+      nameInput.value = "";
+      emailInput.value = "";
+      marksInput.value = "";
+      courseSelect.value = "";
+    }
+
+    function validateForm() {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const marks = Number(marksInput.value);
+      const course = courseSelect.value;
+
+      // Note: In .cshtml Razor views, '@@' can conflict.
+      // In normal .html file it is fine.
+      if (name.length < 3) return "Name must be 3+ characters";
+      if (!email.includes("@@") || !email.includes(".")) return "Email must contain @@ and .";
+      if (!course) return "Please select a course";
+      if (Number.isNaN(marks) || marks < 0 || marks > 100) return "Marks must be 0 to 100";
+
+      return ""; // no error
+    }
+
+    // ------------------------
+    // 4) RENDER TABLE
+    // ------------------------
+    function renderTable() {
+      tbody.innerHTML = ""; // clear existing rows
+
+      for (let i = 0; i < students.length; i++) {
+        const s = students[i];
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${s.name}</td>
+          <td>${s.email}</td>
+          <td>${s.course}</td>
+          <td>${s.marks}</td>
+          <td class="actions">
+            <button onclick="editStudent(${i})">Edit</button>
+            <button onclick="deleteStudent(${i})">Delete</button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    // ------------------------
+    // 5) ADD / UPDATE (Save Button)
+    // ------------------------
+    saveBtn.addEventListener("click", function () {
+      const error = validateForm();
+      if (error) {
+        showMessage(error, "error");
+        return;
+      }
+
+      const studentObj = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        course: courseSelect.value,
+        marks: Number(marksInput.value)
+      };
+
+      // If editIndex is -1 => Add mode
+      if (editIndex === -1) {
+        students.push(studentObj);
+        showMessage("Student added ✅", "ok");
+      } else {
+        // Update mode
+        students[editIndex] = studentObj;
+        showMessage("Student updated ✅", "ok");
+        editIndex = -1;
+        saveBtn.textContent = "Add Student";
+        cancelBtn.style.display = "none";
+      }
+
+      clearForm();
+      renderTable();
+    });
+
+    // ------------------------
+    // 6) DELETE
+    // ------------------------
+    // Note: function is global because we call it from onclick in table HTML.
+    window.deleteStudent = function (index) {
+      const confirmDelete = confirm("Are you sure you want to delete?");
+      if (!confirmDelete) return;
+
+      students.splice(index, 1);
+
+      // If we deleted the row that we were editing, reset form
+      if (editIndex === index) {
+        editIndex = -1;
+        saveBtn.textContent = "Add Student";
+        cancelBtn.style.display = "none";
+        clearForm();
+      }
+
+      showMessage("Student deleted ✅", "ok");
+      renderTable();
+    };
+
+    // ------------------------
+    // 7) EDIT
+    // ------------------------
+    window.editStudent = function (index) {
+      const s = students[index];
+
+      nameInput.value = s.name;
+      emailInput.value = s.email;
+      marksInput.value = s.marks;
+      courseSelect.value = s.course;
+
+      editIndex = index;
+
+      saveBtn.textContent = "Update Student";
+      cancelBtn.style.display = "inline-block";
+
+      showMessage("Editing mode: update and click 'Update Student'", "ok");
+    };
+
+    // ------------------------
+    // 8) CANCEL EDIT
+    // ------------------------
+    cancelBtn.addEventListener("click", function () {
+      editIndex = -1;
+      saveBtn.textContent = "Add Student";
+      cancelBtn.style.display = "none";
+      clearForm();
+      showMessage("Edit cancelled", "ok");
+    });
+</script>

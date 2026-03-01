@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<h3>Name Validation (keyup)</h3>
+
+<input type="text" id="name" placeholder="Enter your name" />
+<p id="nameMsg" style="font-weight:bold;"></p>
+
+<h3>Confirm Password Match (keyup)</h3>
+
+<input type="password" id="password1" placeholder="Enter password" />
+<br>
+<br>
+<input type="password" id="password2" placeholder="Confirm password" />
+
+<p id="matchMsg" style="font-weight:bold;"></p>
+
+<h3>Country Selection (change)</h3>
+
+<select id="country">
+    <option value="">-- Select Country --</option>
+    <option value="India">India</option>
+    <option value="USA">USA</option>
+    <option value="UK">UK</option>
+</select>
+
+<p id="countryMsg" style="font-weight:bold;"></p>
+<script>
+
+    // Name Validation (keyup) Starts
+    const nameInput = document.querySelector("#name"); // # means id Selector
+    const nameMsg = document.querySelector("#nameMsg");
+
+    nameInput.addEventListener("keyup", function () {
+        const value = nameInput.value.trim();
+
+        if (value.length >= 3) {
+            nameMsg.innerText = "✅ Valid Name";
+            nameMsg.style.color = "green";
+        } else {
+            nameMsg.innerText = "❌ Name must be 3+ characters";
+            nameMsg.style.color = "red";
+        }
+    });
+
+        // Confirm Password Match (keyup) Starts
+    const password1 = document.querySelector("#password1");
+    const password2 = document.querySelector("#password2");
+    const matchMsg = document.querySelector("#matchMsg");
+
+    password2.addEventListener("keyup", function () {
+
+        if (password2.value === password1.value && password2.value !== "") {
+            matchMsg.innerText = "✅ Passwords match";
+            matchMsg.style.color = "green";
+        } else {
+            matchMsg.innerText = "❌ Passwords do not match";
+            matchMsg.style.color = "red";
+        }
+
+    });
+
+	const countrySelect = document.querySelector("#country");
+    const countryMsg = document.querySelector("#countryMsg");
+
+    countrySelect.addEventListener("change", function () {
+        
+        if (countrySelect.value !=="") {
+            countryMsg.innerText = "✅ Country selected: " + countrySelect.value;
+            countryMsg.style.color = "green";
+        } else {
+            countryMsg.innerText = "❌ Please select a country";
+            countryMsg.style.color = "red";
+		}
+	});
+
+</script>
